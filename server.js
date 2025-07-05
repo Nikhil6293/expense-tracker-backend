@@ -12,10 +12,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // ✅ MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('✅ MongoDB connected'))
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
@@ -41,6 +38,16 @@ app.post('/expenses', async (req, res) => {
     res.status(201).json(expense);
   } catch (error) {
     res.status(500).json({ message: 'Failed to save expense' });
+  }
+});
+
+app.delete('/expenses/:id', async (req, res) => {
+  try {
+    const result = await Expense.findByIdAndDelete(req.params.id);
+    if (!result) return res.status(404).json({ message: 'Expense not found' });
+    res.status(200).json({ message: 'Deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete expense' });
   }
 });
 
